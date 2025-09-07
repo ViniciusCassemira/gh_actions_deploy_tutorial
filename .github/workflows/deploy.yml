@@ -7,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
     
@@ -22,7 +21,9 @@ jobs:
       with:
         push: true
         tags: viniciuscassemira/deploy-tutorial:latest
+
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Deploy to AWS
@@ -31,12 +32,9 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USER }}
         key: ${{ secrets.SERVER_SSH_KEY }}
-      script: |
-        docker pull viniciuscassemira/deploy-tutorial:latest
-        docker stop meu-app || true
-        docker rm meu-app || true
-        docker image prune -f
-        docker run -d \
-          --name meu-app \
-          -p 80:80 \
-          viniciuscassemira/deploy-tutorial:latest
+        script: |
+          docker pull viniciuscassemira/deploy-tutorial:latest
+          docker stop meu-app || true
+          docker rm meu-app || true
+          docker image prune -f
+          docker run -d --name meu-app -p 80:80 viniciuscassemira/deploy-tutorial:latest
